@@ -1,11 +1,9 @@
+import dotenv from "dotenv";
+dotenv.config()
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import swaggerUI from "swagger-ui-express";
-import { config as ENVConfig } from "dotenv";
-
-// import limiter from './middleware/rateLimit';
-
 import { sequelize } from "./config/db.js";
 import postRoutes from "./routes/postRoute.js";
 import userRoutes from "./routes/userRoute.js";
@@ -14,15 +12,14 @@ import commentRoutes from "./routes/commentRoute.js";
 import { swaggerJSDocs } from "./swagger/v1/swagger.js";
 import auth from "./middleware/auth.js";
 import { errorHandler } from "./middleware/errorHandler.js";
-
-ENVConfig();
+import { apiRateLimiter } from "./middleware/limiter.js";
 
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: "*" }));
 app.use(express.json());
-// app.use(limiter);
+app.use(apiRateLimiter);
+app.use(cors({ origin: "*" }));
 
 // Routes
 app.use("/api/v1/users", userRoutes);
